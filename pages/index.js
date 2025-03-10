@@ -1,5 +1,5 @@
 import Navbar from '../components/Navbar';
-
+import connectDB from "@/lib/mongodb/connect";
 export default function Home() {
   return (
     <div>
