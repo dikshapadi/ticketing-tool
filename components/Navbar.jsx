@@ -24,9 +24,9 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="bg-[#0A192F] text-white p-4 shadow-md">
+    <nav className="bg-[#112240] text-white p-4 shadow-md">
       <div className="container mx-auto flex justify-between items-center">
-        <Link href="/" className="text-2xl font-bold">
+        <Link href="/" className="text-2xl font-bold text-blue-400">
           TicketHub
         </Link>
 

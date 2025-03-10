@@ -57,7 +57,7 @@ export default function AuthForm() {
     return (
         <>
             <Navbar />
-            <div className="flex flex-col items-center justify-center min-h-screen bg-[#112240] px-4">
+            <div className="flex flex-col items-center justify-center min-h-screen bg-[#0A192F]  px-4">
                 <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-md">
                     <h1 className="text-xl font-bold mb-4">{isSignUp ? "Sign Up" : "Sign In"}</h1>
 
