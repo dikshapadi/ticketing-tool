@@ -4,8 +4,6 @@ export default function Home() {
   return (
     <div>
       <Navbar />
-
-      {/* Hero Section */}
       <section className="bg-[#112240] text-white min-h-[calc(100vh-64px)] flex items-center justify-center text-center px-6">
         <div>
           <h1 className="text-4xl font-bold mb-4">
