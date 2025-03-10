@@ -23,7 +23,6 @@ export default async function handler(req, res) {
             process.env.JWT_SECRET,
             { expiresIn: "1h" }
         );
-
         res.status(200).json({ message: "Login successful", token, user });
     } catch (error) {
         console.error("Sign In error:", error);
