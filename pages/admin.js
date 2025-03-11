@@ -12,7 +12,7 @@ export default function AdminPage() {
     const [statusFilter, setStatusFilter] = useState("");
     const [searchQuery, setSearchQuery] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
-    const ticketsPerPage = 10;
+    const ticketsPerPage = 20; // 20 tickets per page
 
     useEffect(() => {
         fetch("/api/tickets")
@@ -46,6 +46,7 @@ export default function AdminPage() {
         if (searchQuery) {
             filtered = filtered.filter(ticket =>
                 ticket.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                ticket.description.toLowerCase().includes(searchQuery.toLowerCase()) || // Added description to search
                 ticket.createdBy?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
                 ticket.assignedTo?.name?.toLowerCase().includes(searchQuery.toLowerCase())
             );
@@ -60,11 +61,11 @@ export default function AdminPage() {
     return (
         <>
             <Navbar />
-            <div className="relative min-h-screen bg-[#0D1117] flex flex-col items-center px-6 sm:px-10 py-10">
+            <div className="relative min-h-screen bg-[#0A192F] flex flex-col items-center px-6 sm:px-10 py-10">
                 <h1 className="text-4xl font-semibold text-white mb-6">Admin Ticket Dashboard</h1>
 
                 {/* Filters Section */}
-                <div className="w-full max-w-6xl bg-[#161B22] p-4 rounded-lg flex flex-wrap gap-4 justify-between items-center shadow-md mb-6">
+                <div className="w-full max-w-7xl bg-[#161B22] p-4 rounded-lg flex flex-wrap gap-4 justify-between items-center shadow-md mb-6">
                     <input
                         type="text"
                         placeholder="Search tickets..."
@@ -80,7 +81,8 @@ export default function AdminPage() {
                     >
                         <option value="">All Statuses</option>
                         <option value="open">Open</option>
-                        <option value="in-progress">In Progress</option>
+                        <option value="in progress">In Progress</option>
+                        <option value="resolved">Resolved</option>
                         <option value="closed">Closed</option>
                     </select>
 
@@ -112,7 +114,7 @@ export default function AdminPage() {
                 </div>
 
                 {/* Table Section */}
-                <div className="relative w-full max-w-6xl bg-[#161B22] rounded-lg p-6 shadow-lg">
+                <div className="relative w-full max-w-7xl bg-[#161B22] rounded-lg p-6 shadow-lg">
                     {loading ? (
                         <div className="flex justify-center items-center py-10">
                             <Loader2 className="animate-spin text-white w-10 h-10" />
@@ -123,6 +125,7 @@ export default function AdminPage() {
                                 <thead>
                                     <tr className="bg-[#21262D] text-gray-300">
                                         <th className="p-4 text-left">Title</th>
+                                        <th className="p-4 text-left">Description</th> {/* Added Description Column */}
                                         <th className="p-4 text-left">Created By</th>
                                         <th className="p-4 text-left">Assigned To</th>
                                         <th className="p-4 text-left">Status</th>
@@ -132,15 +135,22 @@ export default function AdminPage() {
                                 <tbody>
                                     {displayedTickets.length === 0 ? (
                                         <tr>
-                                            <td colSpan="5" className="p-4 text-center text-gray-400">No matching results.</td>
+                                            <td colSpan="6" className="p-4 text-center text-gray-400">No matching results.</td>
                                         </tr>
                                     ) : (
                                         displayedTickets.map(ticket => (
                                             <tr key={ticket._id} className="border-b border-gray-700 hover:bg-[#1F2937] transition duration-200">
                                                 <td className="p-4">{ticket.title}</td>
+                                                <td className="p-4 text-gray-400">{ticket.description}</td> {/* Added Description Field */}
                                                 <td className="p-4">{ticket.createdBy?.name || "Unknown"}</td>
                                                 <td className="p-4">{ticket.assignedTo?.name || "Unassigned"}</td>
-                                                <td className="p-4 capitalize">{ticket.status}</td>
+                                                <td className={`p-4 capitalize font-semibold ${ticket.status === 'open' ? 'text-green-500' :
+                                                    ticket.status === 'in progress' ? 'text-yellow-500' :
+                                                        ticket.status === 'resolved' ? 'text-blue-500' :
+                                                            'text-red-500'
+                                                    }`}>
+                                                    {ticket.status}
+                                                </td>
                                                 <td className={`p-4 capitalize font-semibold ${ticket.priority === 'urgent' ? 'text-red-500' :
                                                     ticket.priority === 'high' ? 'text-orange-500' :
                                                         ticket.priority === 'medium' ? 'text-yellow-500' :
