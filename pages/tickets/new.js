@@ -1,4 +1,5 @@
 import { useState } from "react";
+import Navbar from "@/components/Navbar";
 
 const NewTicket = () => {
   const [title, setTitle] = useState("");
@@ -52,8 +53,10 @@ const NewTicket = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#112240] text-white flex items-center justify-center">
-      <div className="bg-[#0A192F] p-6 rounded-lg shadow-md w-full max-w-lg">
+    <>
+    <Navbar/>
+        <div className="min-h-screen bg-[#0A192F] text-white flex items-center justify-center">
+      <div className="bg-[#112240] p-6 rounded-lg shadow-md w-full max-w-lg">
         <h2 className="text-2xl font-bold mb-4">Raise a Ticket</h2>
 
         {error && <p className="text-red-500">{error}</p>}
@@ -119,6 +122,8 @@ const NewTicket = () => {
         </form>
       </div>
     </div>
+    </>
+
   );
 };
 

@@ -1,14 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation"; 
+import { useRouter, usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
-import { Menu, X } from "lucide-react"; 
+import { Menu, X } from "lucide-react";
 
 const Navbar = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -27,6 +28,12 @@ const Navbar = () => {
     router.push("/login");
   };
 
+  const navItems = [
+    { name: "Home", href: "/" },
+    { name: "Tickets", href: "/tickets" },
+    { name: "Profile", href: "/profile" }
+  ];
+
   return (
     <nav className="bg-[#112240] text-white p-4 shadow-md">
       <div className="container mx-auto flex justify-between items-center">
@@ -35,9 +42,17 @@ const Navbar = () => {
         </Link>
 
         <div className="hidden md:flex space-x-6">
-          <Link href="/" className="hover:text-gray-300">Home</Link>
-          <Link href="/tickets" className="hover:text-gray-300">Tickets</Link>
-          <Link href="/profile" className="hover:text-gray-300">Profile</Link>
+          {navItems.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={`relative hover:text-gray-300 ${
+                pathname === item.href ? "after:content-[''] after:absolute after:left-0 after:bottom-[-2px] after:w-full after:h-[2px] after:bg-blue-400" : ""
+              }`}
+            >
+              {item.name}
+            </Link>
+          ))}
         </div>
 
         <button className="md:hidden" onClick={() => setIsMenuOpen(!isMenuOpen)}>
@@ -59,9 +74,18 @@ const Navbar = () => {
 
       {isMenuOpen && (
         <div className="md:hidden flex flex-col items-center space-y-4 mt-4 bg-[#0A192F] py-4 rounded-lg">
-          <Link href="/" className="hover:text-gray-300" onClick={() => setIsMenuOpen(false)}>Home</Link>
-          <Link href="/tickets" className="hover:text-gray-300" onClick={() => setIsMenuOpen(false)}>Tickets</Link>
-          <Link href="/profile" className="hover:text-gray-300" onClick={() => setIsMenuOpen(false)}>Profile</Link>
+          {navItems.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={`hover:text-gray-300 ${
+                pathname === item.href ? "underline" : ""
+              }`}
+              onClick={() => setIsMenuOpen(false)}
+            >
+              {item.name}
+            </Link>
+          ))}
           {isLoggedIn ? (
             <button onClick={handleLogout} className="bg-red-500 hover:bg-red-600 text-white px-4 py-1 rounded-full">
               Logout
