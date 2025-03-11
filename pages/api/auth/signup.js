@@ -1,4 +1,4 @@
-import bcrypt from "bcrypt";
+import bcrypt from 'bcryptjs';
 import User from "../../../lib/mongodb/models/user";
 
 export default async function handler(req, res) {

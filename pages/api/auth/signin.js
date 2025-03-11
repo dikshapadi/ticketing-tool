@@ -1,6 +1,6 @@
 import connectDB from "../../../lib/mongodb/connect";
 import User from "../../../lib/mongodb/models/user";
-import bcrypt from "bcrypt";
+import bcrypt from 'bcryptjs';
 import jwt from "jsonwebtoken";
 
 export default async function handler(req, res) {
