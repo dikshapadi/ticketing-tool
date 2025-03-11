@@ -168,7 +168,7 @@ export default function AdminPage() {
                 </div>
 
                 {/* Table Section */}
-                <div className="relative w-full max-w-7xl bg-[#161B22] rounded-lg p-6 shadow-lg">
+                <div className="relative w-full max-w-7xl bg-[#0A192F] rounded-lg p-6 shadow-lg">
                     {loading ? (
                         <div className="flex justify-center items-center py-10">
                             <Loader2 className="animate-spin text-white w-10 h-10" />
