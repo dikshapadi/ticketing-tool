@@ -29,9 +29,7 @@ export default function AdminPage() {
 
         checkAuth();
     }, [router]);
-    if (!isAuthorized) {
-        return null; 
-    }
+   
     useEffect(() => {
 
         const fetchTickets = async () => {
