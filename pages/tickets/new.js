@@ -32,6 +32,7 @@ const NewTicket = () => {
           priority: priority.toLowerCase(), // Ensure lowercase
           category,
           createdBy,
+          category,
         }),
       });
 
@@ -107,9 +108,9 @@ const NewTicket = () => {
               onChange={(e) => setCategory(e.target.value)}
             >
               <option value="General">General</option>
-              <option value="IT Support">K8s</option>
-              <option value="HR">Networks</option>
-              <option value="Finance">Project Based</option>
+              <option value="K8s">K8s</option>
+              <option value="Networks">Networks</option>
+              <option value="Project Based">Project Based</option>
             </select>
           </div>
 

@@ -14,7 +14,7 @@ export default async function handler(req, res) {
         }
 
         else if (req.method === 'POST') {
-            const { title, description, priority, createdBy } = req.body;
+            const { title, description, priority, createdBy, category } = req.body;
 
             if (!title || !description || !createdBy) {
                 return res.status(400).json({ message: 'Title, description, and createdBy are required.' });
@@ -30,6 +30,7 @@ export default async function handler(req, res) {
                 description,
                 priority: priority.toLowerCase(),
                 createdBy,
+                category,
             });
 
             await newTicket.save();

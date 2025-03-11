@@ -61,8 +61,8 @@ export default function AdminPage() {
     return (
         <>
             <Navbar />
-            <div className="relative min-h-screen bg-[#0A192F] flex flex-col items-center px-6 sm:px-10 py-10">
-                <h1 className="text-4xl font-semibold text-white mb-6">Admin Ticket Dashboard</h1>
+            <div className="relative min-h-screen bg-[#0A192F] flex flex-col  px-6 sm:px-10 py-10">
+                <h1 className="text-2xl font-semibold text-white mb-6">Hello, Admin</h1>
 
                 {/* Filters Section */}
                 <div className="w-full max-w-7xl bg-[#161B22] p-4 rounded-lg flex flex-wrap gap-4 justify-between items-center shadow-md mb-6">
