@@ -72,8 +72,7 @@ const EditTicket = () => {
                                 type="text"
                                 className="w-full p-2 rounded bg-gray-800 border border-gray-600"
                                 value={ticket.title}
-                                onChange={(e) => setTicket({ ...ticket, title: e.target.value })}
-                                required
+                                disabled
                             />
                         </div>
                         <div>
@@ -81,8 +80,7 @@ const EditTicket = () => {
                             <textarea
                                 className="w-full p-2 rounded bg-gray-800 border border-gray-600"
                                 value={ticket.description}
-                                onChange={(e) => setTicket({ ...ticket, description: e.target.value })}
-                                required
+                                disabled
                             />
                         </div>
                         <div>
@@ -90,7 +88,7 @@ const EditTicket = () => {
                             <select
                                 className="w-full p-2 rounded bg-gray-800 border border-gray-600"
                                 value={ticket.priority}
-                                onChange={(e) => setTicket({ ...ticket, priority: e.target.value })}
+                                disabled
                             >
                                 <option value="low">Low</option>
                                 <option value="medium">Medium</option>
