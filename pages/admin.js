@@ -1,71 +1,178 @@
-import { useEffect, useState } from 'react';
+"use client";
 
-const AdminPage = () => {
+import { useEffect, useState } from "react";
+import Navbar from "../components/Navbar";
+import { Loader2 } from "lucide-react"; // For loading spinner
+
+export default function AdminPage() {
     const [tickets, setTickets] = useState([]);
+    const [filteredTickets, setFilteredTickets] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [priorityFilter, setPriorityFilter] = useState("");
+    const [statusFilter, setStatusFilter] = useState("");
+    const [searchQuery, setSearchQuery] = useState("");
+    const [currentPage, setCurrentPage] = useState(1);
+    const ticketsPerPage = 10;
 
     useEffect(() => {
-        fetch('/api/tickets')
-            .then((res) => res.json())
-            .then((data) => {
-                setTickets(data);
+        fetch("/api/tickets")
+            .then(res => res.json())
+            .then(data => {
+                if (Array.isArray(data)) {
+                    setTickets(data);
+                    setFilteredTickets(data);
+                } else {
+                    setTickets([]);
+                    setFilteredTickets([]);
+                }
                 setLoading(false);
             })
-            .catch((error) => console.error('Error fetching tickets:', error));
+            .catch(error => {
+                console.error("Error fetching tickets:", error);
+                setTickets([]);
+                setFilteredTickets([]);
+                setLoading(false);
+            });
     }, []);
 
+    useEffect(() => {
+        let filtered = tickets;
+        if (priorityFilter) {
+            filtered = filtered.filter(ticket => ticket.priority === priorityFilter);
+        }
+        if (statusFilter) {
+            filtered = filtered.filter(ticket => ticket.status === statusFilter);
+        }
+        if (searchQuery) {
+            filtered = filtered.filter(ticket =>
+                ticket.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                ticket.createdBy?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                ticket.assignedTo?.name?.toLowerCase().includes(searchQuery.toLowerCase())
+            );
+        }
+        setFilteredTickets(filtered);
+        setCurrentPage(1);
+    }, [priorityFilter, statusFilter, searchQuery, tickets]);
+
+    const totalPages = Math.ceil(filteredTickets.length / ticketsPerPage);
+    const displayedTickets = filteredTickets.slice((currentPage - 1) * ticketsPerPage, currentPage * ticketsPerPage);
+
     return (
-        <div className="min-h-screen bg-[#112240] text-white">
-            {/* Navbar */}
-            <nav className="bg-[#0A192F] p-4 shadow-md flex justify-between items-center">
-                <h1 className="text-xl font-bold">Admin Dashboard</h1>
-                <div>
-                    <a href="/" className="text-gray-300 hover:text-white px-4">Home</a>
-                    <a href="/new" className="text-gray-300 hover:text-white px-4">Raise Ticket</a>
+        <>
+            <Navbar />
+            <div className="relative min-h-screen bg-[#0D1117] flex flex-col items-center px-6 sm:px-10 py-10">
+                <h1 className="text-4xl font-semibold text-white mb-6">Admin Ticket Dashboard</h1>
+
+                {/* Filters Section */}
+                <div className="w-full max-w-6xl bg-[#161B22] p-4 rounded-lg flex flex-wrap gap-4 justify-between items-center shadow-md mb-6">
+                    <input
+                        type="text"
+                        placeholder="Search tickets..."
+                        className="flex-grow bg-[#21262D] text-white px-4 py-2 rounded-lg border border-gray-600 outline-none transition focus:border-blue-500"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                    />
+
+                    <select
+                        className="bg-[#21262D] text-white px-3 py-2 rounded-lg border border-gray-600 outline-none transition focus:border-blue-500"
+                        value={statusFilter}
+                        onChange={(e) => setStatusFilter(e.target.value)}
+                    >
+                        <option value="">All Statuses</option>
+                        <option value="open">Open</option>
+                        <option value="in-progress">In Progress</option>
+                        <option value="closed">Closed</option>
+                    </select>
+
+                    <select
+                        className="bg-[#21262D] text-white px-3 py-2 rounded-lg border border-gray-600 outline-none transition focus:border-blue-500"
+                        value={priorityFilter}
+                        onChange={(e) => setPriorityFilter(e.target.value)}
+                    >
+                        <option value="">All Priorities</option>
+                        <option value="urgent">Urgent</option>
+                        <option value="high">High</option>
+                        <option value="medium">Medium</option>
+                        <option value="low">Low</option>
+                    </select>
+
+                    <button
+                        onClick={() => { setPriorityFilter(""); setStatusFilter(""); setSearchQuery(""); }}
+                        className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition"
+                    >
+                        Reset Filters
+                    </button>
                 </div>
-            </nav>
 
-            {/* Admin Ticket Management */}
-            <div className="flex items-center justify-center py-6">
-                <div className="bg-[#0A192F] p-6 rounded-lg shadow-md w-full max-w-5xl">
-                    <h2 className="text-2xl font-bold mb-6 text-center">Admin - Ticket Management</h2>
+                {/* Active Filters as Badges */}
+                <div className="flex gap-2 flex-wrap mb-4">
+                    {priorityFilter && <span className="bg-blue-600 text-white px-3 py-1 rounded-full text-sm">Priority: {priorityFilter}</span>}
+                    {statusFilter && <span className="bg-green-600 text-white px-3 py-1 rounded-full text-sm">Status: {statusFilter}</span>}
+                    {searchQuery && <span className="bg-gray-600 text-white px-3 py-1 rounded-full text-sm">Search: {searchQuery}</span>}
+                </div>
 
+                {/* Table Section */}
+                <div className="relative w-full max-w-6xl bg-[#161B22] rounded-lg p-6 shadow-lg">
                     {loading ? (
-                        <p className="text-center text-gray-400">Loading tickets...</p>
-                    ) : tickets.length === 0 ? (
-                        <p className="text-center text-gray-400">No tickets available.</p>
+                        <div className="flex justify-center items-center py-10">
+                            <Loader2 className="animate-spin text-white w-10 h-10" />
+                        </div>
                     ) : (
                         <div className="overflow-x-auto">
-                            <table className="w-full border-collapse border border-gray-600 text-gray-300">
+                            <table className="w-full text-white border-collapse rounded-lg overflow-hidden">
                                 <thead>
-                                    <tr className="bg-gray-800 text-white">
-                                        <th className="border border-gray-600 px-4 py-2">Title</th>
-                                        <th className="border border-gray-600 px-4 py-2">Description</th>
-                                        <th className="border border-gray-600 px-4 py-2">Created By</th>
-                                        <th className="border border-gray-600 px-4 py-2">Assigned To</th>
-                                        <th className="border border-gray-600 px-4 py-2">Status</th>
-                                        <th className="border border-gray-600 px-4 py-2">Priority</th>
+                                    <tr className="bg-[#21262D] text-gray-300">
+                                        <th className="p-4 text-left">Title</th>
+                                        <th className="p-4 text-left">Created By</th>
+                                        <th className="p-4 text-left">Assigned To</th>
+                                        <th className="p-4 text-left">Status</th>
+                                        <th className="p-4 text-left">Priority</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {tickets.map((ticket) => (
-                                        <tr key={ticket._id} className="border-t border-gray-600 hover:bg-gray-900 transition">
-                                            <td className="border border-gray-600 px-4 py-2">{ticket.title}</td>
-                                            <td className="border border-gray-600 px-4 py-2">{ticket.description}</td>
-                                            <td className="border border-gray-600 px-4 py-2">{ticket.createdBy?.name || 'Unknown'}</td>
-                                            <td className="border border-gray-600 px-4 py-2">{ticket.assignedTo?.name || 'Unassigned'}</td>
-                                            <td className="border border-gray-600 px-4 py-2">{ticket.status}</td>
-                                            <td className="border border-gray-600 px-4 py-2">{ticket.priority}</td>
+                                    {displayedTickets.length === 0 ? (
+                                        <tr>
+                                            <td colSpan="5" className="p-4 text-center text-gray-400">No matching results.</td>
                                         </tr>
-                                    ))}
+                                    ) : (
+                                        displayedTickets.map(ticket => (
+                                            <tr key={ticket._id} className="border-b border-gray-700 hover:bg-[#1F2937] transition duration-200">
+                                                <td className="p-4">{ticket.title}</td>
+                                                <td className="p-4">{ticket.createdBy?.name || "Unknown"}</td>
+                                                <td className="p-4">{ticket.assignedTo?.name || "Unassigned"}</td>
+                                                <td className="p-4 capitalize">{ticket.status}</td>
+                                                <td className={`p-4 capitalize font-semibold ${ticket.priority === 'urgent' ? 'text-red-500' :
+                                                    ticket.priority === 'high' ? 'text-orange-500' :
+                                                        ticket.priority === 'medium' ? 'text-yellow-500' :
+                                                            'text-green-500'
+                                                    }`}>
+                                                    {ticket.priority}
+                                                </td>
+                                            </tr>
+                                        ))
+                                    )}
                                 </tbody>
                             </table>
                         </div>
                     )}
+
+                    {/* Pagination */}
+                    {totalPages > 1 && (
+                        <div className="flex justify-center items-center mt-4 gap-2">
+                            {Array.from({ length: totalPages }, (_, i) => (
+                                <button
+                                    key={i}
+                                    onClick={() => setCurrentPage(i + 1)}
+                                    className={`px-3 py-1 rounded-lg ${currentPage === i + 1 ? "bg-blue-500 text-white" : "bg-gray-700 text-gray-300 hover:bg-gray-600"
+                                        }`}
+                                >
+                                    {i + 1}
+                                </button>
+                            ))}
+                        </div>
+                    )}
                 </div>
             </div>
-        </div>
+        </>
     );
-};
-
-export default AdminPage;
+}
