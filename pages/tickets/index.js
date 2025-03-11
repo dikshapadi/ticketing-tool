@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import Navbar from "@/components/Navbar";
+import Link from "next/link";
 
 export default function Tickets() {
   const [tickets, setTickets] = useState([]);
@@ -14,25 +15,31 @@ export default function Tickets() {
       try {
         const response = await fetch("/api/tickets", { method: "GET" });
         const data = await response.json();
-  
+
         const ticketsWithUserNames = await Promise.all(
           data.map(async (ticket) => {
             try {
-              console.log(`Fetching user for ticket ID: ${ticket._id}, Created By: ${ticket.createdBy}`);
-  
+              console.log(
+                `Fetching user for ticket ID: ${ticket._id}, Created By: ${ticket.createdBy}`
+              );
+
               // Fetch createdBy name
-              const createdByResponse = await fetch(`/api/user?id=${ticket.createdBy}`);
+              const createdByResponse = await fetch(
+                `/api/user?id=${ticket.createdBy}`
+              );
               const createdByData = await createdByResponse.json();
               const createdByName = createdByData.name || "Unknown";
-  
+
               // Fetch assignedTo name (if assigned)
               let assignedToName = "Unassigned";
               if (ticket.assignedTo) {
-                const assignedToResponse = await fetch(`/api/user?id=${ticket.assignedTo}`);
+                const assignedToResponse = await fetch(
+                  `/api/user?id=${ticket.assignedTo}`
+                );
                 const assignedToData = await assignedToResponse.json();
                 assignedToName = assignedToData.name || "Unknown";
               }
-  
+
               return {
                 ...ticket,
                 createdBy: createdByName,
@@ -48,7 +55,7 @@ export default function Tickets() {
             }
           })
         );
-  
+
         setTickets(ticketsWithUserNames);
       } catch (error) {
         console.error("Error fetching tickets:", error);
@@ -56,10 +63,10 @@ export default function Tickets() {
         setLoading(false);
       }
     };
-  
+
     fetchTickets();
   }, []);
-  
+
   const fetchUserName = async (userId) => {
     try {
       const res = await fetch(`/api/user?id=${userId}`);
@@ -79,7 +86,7 @@ export default function Tickets() {
         body: JSON.stringify({
           id,
           assignedTo: userId,
-          status: "in progress"
+          status: "in progress",
         }),
       });
 
@@ -108,9 +115,11 @@ export default function Tickets() {
       <div className="container mx-auto py-8 px-4">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-xl font-bold">All Tickets</h1>
+          <Link href="/tickets/new">
           <button className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded text-white">
             + Create Ticket
           </button>
+          </Link>
         </div>
 
         {loading ? (
@@ -152,7 +161,7 @@ export default function Tickets() {
                     </td>
                     <td
                       className={`p-3 font-bold ${
-                        ticket.priority === "urgent" 
+                        ticket.priority === "urgent"
                           ? "text-red-400"
                           : ticket.priority === "medium"
                           ? "text-yellow-300"
@@ -162,18 +171,19 @@ export default function Tickets() {
                       {ticket.priority}
                     </td>
                     <td className="p-3">
-  {ticket.status === "open" && (!ticket.assignedTo || ticket.assignedTo === "Unassigned") ? (
-    <button
-      onClick={() => handleSelfAssign(ticket._id)}
-      className="bg-green-500 hover:bg-green-600 px-4 py-1 rounded"
-    >
-      Self Assign
-    </button>
-  ) : (
-    "-"
-  )}
-</td>
-
+                      {ticket.status === "open" &&
+                      (!ticket.assignedTo ||
+                        ticket.assignedTo === "Unassigned") ? (
+                        <button
+                          onClick={() => handleSelfAssign(ticket._id)}
+                          className="bg-green-500 hover:bg-green-600 px-4 py-1 rounded"
+                        >
+                          Self Assign
+                        </button>
+                      ) : (
+                        "-"
+                      )}
+                    </td>
                   </tr>
                 ))}
               </tbody>
