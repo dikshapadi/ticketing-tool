@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
 import { Loader2 } from "lucide-react"; // For loading spinner
-
+import { useRouter } from "next/navigation";
 export default function AdminPage() {
     const [tickets, setTickets] = useState([]);
     const [filteredTickets, setFilteredTickets] = useState([]);
@@ -13,8 +13,27 @@ export default function AdminPage() {
     const [searchQuery, setSearchQuery] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
     const ticketsPerPage = 20; // 20 tickets per page
-
+    const [isAuthorized, setIsAuthorized] = useState(false);
+    const router = useRouter();
     useEffect(() => {
+        const checkAuth = () => {
+            const token = localStorage.getItem("token");
+            const userRole = localStorage.getItem("userRole");
+
+            if (!token || userRole !== "support") {
+                router.replace("/login"); 
+            } else {
+                setIsAuthorized(true);
+            }
+        };
+
+        checkAuth();
+    }, [router]);
+    if (!isAuthorized) {
+        return null; 
+    }
+    useEffect(() => {
+
         const fetchTickets = async () => {
             try {
                 const response = await fetch("/api/tickets");
