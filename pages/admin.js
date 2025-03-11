@@ -15,25 +15,62 @@ export default function AdminPage() {
     const ticketsPerPage = 20; // 20 tickets per page
 
     useEffect(() => {
-        fetch("/api/tickets")
-            .then(res => res.json())
-            .then(data => {
-                if (Array.isArray(data)) {
-                    setTickets(data);
-                    setFilteredTickets(data);
-                } else {
+        const fetchTickets = async () => {
+            try {
+                const response = await fetch("/api/tickets");
+                const data = await response.json();
+    
+                if (!Array.isArray(data)) {
                     setTickets([]);
                     setFilteredTickets([]);
+                    setLoading(false);
+                    return;
                 }
-                setLoading(false);
-            })
-            .catch(error => {
+    
+                const ticketsWithUserNames = await Promise.all(
+                    data.map(async (ticket) => {
+                        let createdByName = "Unknown";
+                        let assignedToName = "Unassigned";
+    
+                        try {
+                            if (ticket.createdBy) {
+                                const userResponse = await fetch(`/api/user?id=${ticket.createdBy}`);
+                                const userData = await userResponse.json();
+                                createdByName = userData.name || "Unknown";
+                            }
+                        } catch (error) {
+                            console.error("Error fetching createdBy user data:", error);
+                        }
+    
+                        try {
+                            if (ticket.assignedTo) {
+                                const assignedResponse = await fetch(`/api/user?id=${ticket.assignedTo}`);
+                                const assignedData = await assignedResponse.json();
+                                assignedToName = assignedData.name || "Unassigned";
+                            }
+                        } catch (error) {
+                            console.error("Error fetching assignedTo user data:", error);
+                        }
+    
+                        return { ...ticket, createdBy: createdByName, assignedTo: assignedToName };
+                    })
+                );
+    
+                setTickets(ticketsWithUserNames);
+                setFilteredTickets(ticketsWithUserNames);
+            } catch (error) {
                 console.error("Error fetching tickets:", error);
                 setTickets([]);
                 setFilteredTickets([]);
+            } finally {
                 setLoading(false);
-            });
+            }
+        };
+    
+        fetchTickets();
     }, []);
+    
+    
 
     useEffect(() => {
         let filtered = tickets;
@@ -142,8 +179,8 @@ export default function AdminPage() {
                                             <tr key={ticket._id} className="border-b border-gray-700 hover:bg-[#1F2937] transition duration-200">
                                                 <td className="p-4">{ticket.title}</td>
                                                 <td className="p-4 text-gray-400">{ticket.description}</td> {/* Added Description Field */}
-                                                <td className="p-4">{ticket.createdBy?.name || "Unknown"}</td>
-                                                <td className="p-4">{ticket.assignedTo?.name || "Unassigned"}</td>
+                                                <td className="p-4">{ticket.createdBy || "Unknown"}</td>
+                                                <td className="p-4">{ticket.assignedTo || "Unassigned"}</td>
                                                 <td className={`p-4 capitalize font-semibold ${ticket.status === 'open' ? 'text-green-500' :
                                                     ticket.status === 'in progress' ? 'text-yellow-500' :
                                                         ticket.status === 'resolved' ? 'text-blue-500' :

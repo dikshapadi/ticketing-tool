@@ -1,15 +1,12 @@
 import connectDB from '@/lib/mongodb/connect';
 import Ticket from '@/lib/mongodb/models/ticket';
-import User from '@/lib/mongodb/models/user';  // Import the User model
 
 export default async function handler(req, res) {
     try {
-        await connectDB(); // Ensure we reuse the existing connection
+        await connectDB(); 
 
         if (req.method === 'GET') {
-            const tickets = await Ticket.find()
-                .populate('createdBy', 'name')  // Populate createdBy with User name
-                .populate('assignedTo', 'name'); // Populate assignedTo with User name
+            const tickets = await Ticket.find();
             return res.status(200).json(tickets);
         }
 
@@ -35,6 +32,26 @@ export default async function handler(req, res) {
 
             await newTicket.save();
             return res.status(201).json({ message: 'Ticket created successfully', ticket: newTicket });
+        }
+
+        else if (req.method === 'PATCH') {
+            const { id, assignedTo, status } = req.body;
+
+            if (!id) {
+                return res.status(400).json({ message: 'Ticket ID is required.' });
+            }
+
+            const updatedTicket = await Ticket.findByIdAndUpdate(
+                id,
+                { assignedTo, status },
+                { new: true }
+            );
+
+            if (!updatedTicket) {
+                return res.status(404).json({ message: 'Ticket not found.' });
+            }
+
+            return res.status(200).json({ message: 'Ticket updated successfully', ticket: updatedTicket });
         }
 
         return res.status(405).json({ message: 'Method not allowed' });

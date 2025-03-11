@@ -37,6 +37,10 @@ export default function AuthForm() {
             if (res.ok) {
                 alert(isSignUp ? "Account created successfully!" : "Logged in successfully!");
                 localStorage.setItem("token", data.token);
+                localStorage.setItem("userId", data.user._id);
+                localStorage.setItem("userName", data.user.name);
+                localStorage.setItem("userRole", data.user.role);
+                localStorage.setItem("userEmail", data.user.email);
                 router.replace("/");
             } else {
                 alert(data.message);

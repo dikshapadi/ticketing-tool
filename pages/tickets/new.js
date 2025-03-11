@@ -11,8 +11,7 @@ const NewTicket = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Example user ID (Replace this with actual logged-in user ID)
-    const createdBy = "65d1234abcde56789f012345"; // Hardcoded for now
+    const createdBy = localStorage.getItem("userId");
 
     // Basic validation
     if (!title || !description) {
@@ -61,7 +60,6 @@ const NewTicket = () => {
         {success && <p className="text-green-500">{success}</p>}
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Title */}
           <div>
             <label className="block text-gray-300">Title</label>
             <input
