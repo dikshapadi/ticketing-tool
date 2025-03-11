@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useState } from "react";
@@ -111,6 +112,24 @@ export default function AdminPage() {
     const totalPages = Math.ceil(filteredTickets.length / ticketsPerPage);
     const displayedTickets = filteredTickets.slice((currentPage - 1) * ticketsPerPage, currentPage * ticketsPerPage);
 
+    const handleDelete = async (id) => {
+        if (confirm("Are you sure you want to delete this ticket?")) {
+            try {
+                const response = await fetch(`/api/tickets/${id}`, {
+                    method: 'DELETE',
+                });
+                if (response.ok) {
+                    setTickets(tickets.filter(ticket => ticket._id !== id));
+                    setFilteredTickets(filteredTickets.filter(ticket => ticket._id !== id));
+                } else {
+                    console.error("Failed to delete ticket");
+                }
+            } catch (error) {
+                console.error("Error deleting ticket:", error);
+            }
+        }
+    };
+
     return (
         <>
             <Navbar />
@@ -181,18 +200,19 @@ export default function AdminPage() {
                                     <th className="p-3 border border-gray-600">Assigned To</th>
                                     <th className="p-3 border border-gray-600">Status</th>
                                     <th className="p-3 border border-gray-600">Priority</th>
+                                    <th className="p-3 border border-gray-600">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {loading ? (
                                     <tr>
-                                        <td colSpan="6" className="p-4 text-center text-gray-400">
+                                        <td colSpan="7" className="p-4 text-center text-gray-400">
                                             <Loader2 className="animate-spin text-white w-10 h-10 mx-auto" />
                                         </td>
                                     </tr>
                                 ) : displayedTickets.length === 0 ? (
                                     <tr>
-                                        <td colSpan="6" className="p-4 text-center text-gray-400">No matching results.</td>
+                                        <td colSpan="7" className="p-4 text-center text-gray-400">No matching results.</td>
                                     </tr>
                                 ) : (
                                     displayedTickets.map(ticket => (
@@ -214,6 +234,20 @@ export default function AdminPage() {
                                                         'text-green-500'
                                                 }`}>
                                                 {ticket.priority}
+                                            </td>
+                                            <td className="p-3 border border-gray-600">
+                                                <button
+                                                    onClick={() => router.push(`/tickets/edit/${ticket._id}`)}
+                                                    className="bg-blue-500 text-white px-3 py-1 rounded-lg mr-2 hover:bg-blue-600 transition"
+                                                >
+                                                    Edit
+                                                </button>
+                                                <button
+                                                    onClick={() => handleDelete(ticket._id)}
+                                                    className="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-600 transition"
+                                                >
+                                                    Delete
+                                                </button>
                                             </td>
                                         </tr>
                                     ))

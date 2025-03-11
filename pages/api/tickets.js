@@ -1,9 +1,10 @@
+// pages/api/tickets.js
 import connectDB from '@/lib/mongodb/connect';
 import Ticket from '@/lib/mongodb/models/ticket';
 
 export default async function handler(req, res) {
     try {
-        await connectDB(); 
+        await connectDB();
 
         if (req.method === 'GET') {
             const tickets = await Ticket.find();
@@ -35,7 +36,7 @@ export default async function handler(req, res) {
         }
 
         else if (req.method === 'PATCH') {
-            const { id, assignedTo, status } = req.body;
+            const { id, title, description, assignedTo, status, priority } = req.body;
 
             if (!id) {
                 return res.status(400).json({ message: 'Ticket ID is required.' });
@@ -43,7 +44,7 @@ export default async function handler(req, res) {
 
             const updatedTicket = await Ticket.findByIdAndUpdate(
                 id,
-                { assignedTo, status },
+                { title, description, assignedTo, status, priority },
                 { new: true }
             );
 
