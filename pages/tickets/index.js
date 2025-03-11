@@ -6,6 +6,10 @@ export default function Tickets() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      window.location.href = "/login";
+    }
     const fetchTickets = async () => {
       try {
         const response = await fetch("/api/tickets", { method: "GET" });
