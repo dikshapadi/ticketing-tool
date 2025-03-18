@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tickethub
+  labels:
+    app: tickethub
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: tickethub
+  template:
+    metadata:
+      labels:
+        app: tickethub
+    spec:
+      containers:
+      - name: tickethub
+        image: dikshpadi/test-apps:latest
+        ports:
+        - containerPort: 3000
+        env:
+        - name: MONGO_URI
+          valueFrom:
+            secretKeyRef:
+              name: my-secret
+              key: MONGO_URI
+        - name: JWT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: my-secret
+              key: JWT_SECRET
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tickethub-service
+spec:
+  selector:
+    app: tickethub
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3000
+      nodePort: 30001
+  type: NodePort
