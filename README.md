@@ -1,40 +1,76 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/pages/api-reference/create-next-app).
+# TicketHub - A Lightweight Ticketing Tool for Developers and Support Teams at AT&T
 
-## Getting Started
+TicketHub is a streamlined ticketing tool built with Next.js, Docker, and Kubernetes. It seamlessly integrates with MongoDB and leverages environment variables for flexible configuration.
 
-First, run the development server:
+## 🚀 Prerequisites
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+Before getting started, ensure you have the following installed:
+
+- **Node.js** (v18 or later)
+- **Docker**
+- **Kubernetes** (Minikube)
+- **kubectl**
+
+## 📥 Getting Started
+
+### 1️⃣ Clone the Repository
+
+```sh
+git clone https://github.com/dikshapadi/ticketing-tool.git
+cd ticketing-tool
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2️⃣ Install Dependencies
 
-You can start editing the page by modifying `pages/index.js`. The page auto-updates as you edit the file.
+```sh
+npm install
+```
 
-[API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.js`.
+### 3️⃣ Run the Application Locally
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) instead of React pages.
+```sh
+npm run dev
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/pages/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Now, open your browser and visit [http://localhost:3000](http://localhost:3000) to access the application.
 
-## Learn More
+## 🐳 Dockerizing the Application
 
-To learn more about Next.js, take a look at the following resources:
+### 4️⃣ Build and Push the Docker Image
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn-pages-router) - an interactive Next.js tutorial.
+```sh
+docker build -t tickethub .
+docker tag tickethub:latest <your-dockerhub-username>/<repository-name>:latest
+docker push <your-dockerhub-username>/<repository-name>:latest
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## ☸️ Deploying to Kubernetes
 
-## Deploy on Vercel
+### 5️⃣ Deploy on Kubernetes
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```sh
+kubectl create deployment tickethub --image=<your-dockerhub-username>/<repository-name>:latest
+kubectl expose deployment tickethub --type=NodePort --port=3000
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/pages/building-your-application/deploying) for more details.
+### 6️⃣ Apply Secrets and Deployment Configuration
+
+Ensure you have the `secret.yaml` and `deployment.yaml` files as specified in the GitHub repository. Then apply them:
+
+```sh
+kubectl apply -f secret.yaml
+kubectl apply -f deployment.yaml
+```
+
+### 7️⃣ Access the Application
+
+Retrieve the service URL using Minikube:
+
+```sh
+minikube service tickethub --url
+```
+
+Open the generated URL in your browser, and TicketHub is ready to use! 🎉
+
+
+
